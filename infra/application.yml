@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: API Gateway
+
+Globals:
+  Function:
+    Runtime: go1.x
+    Handler: handler
+    Timeout: 30
+    MemorySize: 128
+    AutoPublishAlias: prod
+    DeploymentPreference:
+      Type: AllAtOnce
+
+Resources:
+  FunctionBonjour:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Send a friendly greeting to requests.
+      Runtime: go1.x
+      CodeUri: ../dist/bonjour/
+      Events:
+        HTTPRequest:
+          Type: Api
+          Properties:
+            Path: /bonjour
+            Method: get
+
+  FunctionVersion:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Display the deployed version.
+      Runtime: go1.x
+      CodeUri: ../dist/version/
+      Events:
+        HTTPRequest:
+          Type: Api
+          Properties:
+            Path: /version
+            Method: get
+
+Outputs:
+  Endpoint:
+    Description: URL for HTTPS Endpoint
+    Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${ServerlessRestApiProdStage}/
